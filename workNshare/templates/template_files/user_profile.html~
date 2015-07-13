@@ -1,0 +1,185 @@
+{% extends 'template_files/welcome.html' %}
+{% load static %}
+    {% block login %}
+       <li  style="position: absolute;right:50px;top:10px;"><button class="btn btn-default" id='logout_button' onclick="window.location='/logout/';">Logout</button></li>
+    
+{% endblock %}
+{% block home_page_view %}
+	{% if profile.matched %}
+		<div class="col-lg-4 col-md-4">
+	            <div class="profile_pic_div">
+	            <img src="../../../media/{{profile.profile_picture}}" alt="Profile Picture Not Available" class="img-thumbnail">
+</div>
+	<hr>
+	<div class="name_div">
+	<span class="label label-success" style="font-size: 24px;">
+	{{profile.name|capfirst|default:"No record"}}
+	
+	</span>
+	</div>
+	<hr><hr>
+	
+		<div class="connect_div">
+		{% if profile.already_connected %}
+		
+			   <button class="btn btn-success btn-block" id='connect_button' disabled="disabled">Already Following {{ profile.searched_username }}</button>
+		
+		{% else %}
+	<form method="post" action='/profile/{{ profile.searched_username }}/'>
+{% csrf_token %}
+	   <button type="submit" class="btn btn-info btn-block" id='connect_button'>Start following {{ profile.searched_username }}</button>
+</form>
+{% endif %}
+	</div>
+	<hr>
+				{% if profile.already_connected %}
+	
+	<div class="share_div">
+	
+<button class="btn btn-info btn-block" id='share_button' data-toggle="modal" data-target="#ShareModal">Share <span class="glyphicon glyphicon-share"></span></button>
+	
+
+	</div>
+	
+	
+	
+	  
+	
+	
+	<hr>
+	
+	
+	<!-- Followers list -->
+	<div class="followers_list">
+	<button class="btn btn-info btn-block" data-toggle="modal" 
+   data-target="#modalForFollowerslist">
+  People following {{profile.name}}
+    <span class="badge pull-right">{{ profile.followers_list|length }}</span>
+   
+</button>
+<div class="modal fade" id="modalForFollowerslist" tabindex="-1" role="dialog" 
+   aria-labelledby="modalForFollowerslist" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h2 class="modal-title" id="myModalLabel">
+ 	Followers List
+            </h2>
+         </div>
+         <div class="modal-body">
+{% if profile.followers_list|length == 0 %}
+<h1>No followers...</h1>
+{% else %}
+{% for followers in profile.followers_list %}
+<a href="/profile/{{ followers.username }}">{{ followers.username }}</a><hr>
+{% endfor %}
+{% endif %}         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-primary" 
+               data-dismiss="modal">Close
+            </button>
+         </div>
+      </div>
+    </div>
+</div>
+	</div>
+		<!-- Followers list ends -->
+		
+		
+		
+		
+		<!-- Following list -->
+	<hr>
+	<div class="following_list">
+		<button class="btn btn-info btn-block" data-toggle="modal" 
+   data-target="#modalForFollowinglist">
+  People followed by {{profile.name}}
+    <span class="badge pull-right">{{ profile.following_list|length }}</span>
+</button>
+<div class="modal fade" id="modalForFollowinglist" tabindex="-1" role="dialog" 
+   aria-labelledby="modalForFollowinglist" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h2 class="modal-title" id="myModalLabel">
+               Following List
+            </h2>
+         </div>
+         <div class="modal-body">
+{% if profile.following_list|length == 0 %}
+<h1>Nobody is following...</h1>
+{% else %}
+{% for followee in profile.following_list %}
+<a href="/profile/{{ followee.username }}">{{ followee.username }}</a><hr>
+{% endfor %}
+{% endif %}         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" 
+               data-dismiss="modal">Close
+            </button>
+         </div>
+      </div>
+    </div>
+</div>
+	</div>
+	
+			<!-- Following list ends  -->
+	
+	
+	
+	{% else %}<br>
+<span class="label label-default" style="font-size: 20px;">
+Follow {{profile.searched_username}} to enable sharing	
+	</span>
+		{% endif %}
+	</div>
+	
+	
+	
+	<!-- Visited User Profile -->
+	<div class="col-lg-8 col-md-8">
+	<div class="panel panel-success">
+	  <div class="panel-heading" style="font-weight: bold;font-size: 30px;">Information</div>
+	  <ul class="list-group" >
+    <li class="list-group-item"> 
+    <h4 class="text-center" >{{profile.gender|default:"No record"}}</h4></li>
+    <li class="list-group-item">
+      <h4 class="text-center">{{profile.dob|default:"No record"}}</h4>
+<h4 class="text-center">
+{% if profile.age %}
+({{profile.age}} years old)
+{% else %}
+(No record)
+{% endif %}
+</h4>
+    </li>
+    <li class="list-group-item">
+     <h4 class="text-center">{{profile.institute|default:"No record"}}</h4>
+    </li>
+    <li class="list-group-item">
+    <h4 class="text-center">{{profile.number|default:"No record"}}</h4>
+    </li>
+    <li class="list-group-item">
+    <h4 class="text-center">{{profile.email}}</h4>
+    </li>
+  </ul>
+	
+	</div>
+	
+	</div>
+		<!-- Visited User Profile ends -->
+	
+        {% else %}
+        <h1>No result found!!!</h1>
+        {% endif %}
+      
+{% endblock %}
+	

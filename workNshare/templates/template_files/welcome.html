@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+{% load static %}
+{% load emoticons_tags %}
+
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="Follow your friends and share documents with them">
+<meta name="keywords" content="Sharing, Documents, Login, Follow">
+<link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+<link href="{% static 'css/welcome.css' %}" rel="stylesheet">
+<title>Let's Share</title>
+</head>
+<body>
+<!--  Navigation Bar -->
+<div class="navbar-wrapper">
+      <div class="container">
+
+        <nav class="navbar navbar-default navbar-static-top" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+<a class="navbar-brand" href="/" style="font-size: 300%;color:white;font-weight: bold;color:black;">e-Sharing</a>
+            </div>
+            <div>
+              <ul class="nav navbar-nav">
+              {% if user_info.authenticated %}
+       <li style="position: absolute;right:50%;">
+        <form class="navbar-form navbar-left" onsubmit="return validateForm()" role="search"  name="searchForm" action="/find/" method="get">
+<div class="form-group">
+<input type="search" name="searched_user" id="searched_user" value="{{ user_info.searched_user_name }}" class="form-control" autocomplete="off" placeholder="Enter name of user to be searched." style="width:200%;color: threeddarkshadow;">
+<input type="hidden" name="page" value="{{page_value|default:'1'}}">
+
+</div>
+              <button type="submit" class="btn btn-success btn-md" style="position: absolute;right:-100%;"><span class="glyphicon glyphicon-search"></span></button><br>
+</form>
+</li>
+<li style="position: absolute;right:15%;top:15%;"><button class="btn btn-primary" id='share_button' data-toggle="modal" data-target="#ShareModal">Share <span class="glyphicon glyphicon-share"></span></button></li>
+
+   <li  style="position: absolute;right:3%;top:15%;"><button class="btn btn-default" id='logout_button' onclick="window.location='/logout/';">Logout</button></li>
+       {% else %}
+    {% block login %}
+<li style="position: absolute;right:20%;top:15%;"><button class="btn btn-info" id='register_button' data-toggle="modal" data-target="#registerModal">Register</button></li>
+<li style="position: absolute;right:3%;top:15%;"><button class="btn btn-primary" id='login_button' onclick="window.location.hash='#loginview';">Login</button></li>
+{% endblock %}
+{% endif %}
+</ul>
+            </div>
+          </div>
+        </nav>
+
+      </div>
+    </div>
+    {% if user_info.authenticated %}
+    <br><br><br>
+    {% else %}
+    <br>
+    {% endif %}
+<!-- Navigation Bar ends -->
+
+
+{% block home_page_view %}
+{% if user_info.authenticated %}
+
+<!-- Vertical Navigation Bar -->
+<div class="col-lg-2 col-md-2">
+<ul class="nav nav-pills nav-justified nav-stacked" style="border: 20px solid #E9E1E1;border-radius: 15px;">
+ <li class="active" style="text-align: center;"><a href="#home" data-toggle="tab" ><span class="glyphicon glyphicon-home"></span><br>Home</a></li><hr>
+<li style="text-align: center;"><a href="#settings" data-toggle="tab" ><span class="glyphicon glyphicon-wrench"></span><br>Settings</a></li><hr>
+<li style="text-align: center;"><a href="#summary" data-toggle="tab"><span class="glyphicon glyphicon-calendar"></span><br>Summary</a></li><hr>
+<li style="text-align: center;"><a href="#following" data-toggle="tab"><span class="glyphicon glyphicon-heart"></span><br>Following</a></li><hr>
+<li style="text-align: center;"><a href="#followers" data-toggle="tab"><span class="glyphicon glyphicon-star"></span><br>Followers</a></li><hr>
+
+</ul>
+  </div>
+  <!-- Vertical Navigation Bar ends -->
+
+
+
+
+
+    <!-- changing part -->
+  <div class="col-lg-7 col-md-7">
+  <div id="myTabContent" class="tab-content">
+<div class="tab-pane fade in active" id="home">
+{% if user_info.share_home|length == 0 %}
+<h1>No one has shared anything with you...</h1>
+{% else %}
+<h2 style="text-align: center;text-decoration: underline;">{{ user_info.share_home|length }} documents have been shared with you.</h2>
+{% for share in  user_info.share_home %}
+<div class="jumbotron" style="border: 2px solid #a1a1a1;border-radius: 15px;padding-left: 10px;padding-right: 10px;background-color: #FAFAFA;">
+<span class="glyphicon glyphicon-share-alt" style="font-size:20px;"></span>
+<span style="font-size: 20px;padding-left: 10px;">From <a href="/profile/{{ share.share_from }}/">{{ share.share_from }}</a></span>
+<span style="position: absolute;left: 80%;">
+<small style="color:gray;">{{ share.shared_at }}</small>
+</span>
+<div class="well well-sm" style="font-style: italic; word-wrap: break-word;background-color: white;">
+{{ share.message|emoticons|default:'Checkout what I have shared with you!!!' }}<hr>
+<span>Document Shared : {{ share.document.url|slice:'24:' }}&nbsp;&nbsp;&nbsp;<a href="{{ share.document.url }}" download><span class="glyphicon glyphicon-download-alt"></span></a></span>
+</div>
+</div>
+{% endfor %}
+{% endif %}
+</div>
+
+<div class="tab-pane fade in" id="settings">
+
+<div class="jumbotron" style="border: 2px solid #a1a1a1;border-radius: 15px;background-color: #F2F2F2;">
+<div class="panel-group" id="accordion">
+   <div class="panel">
+      <div class="panel-heading">
+         <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+            <h3 style="font-weight: bold;"> General Settings</h3>
+            </a>
+         </h4>
+      </div>
+      <div id="collapseOne" class="panel-collapse collapse in">
+         <div class="panel-body">
+     <button class="btn btn-default btn-block" id='update_details_button' data-toggle="modal" data-target="#updatedetailsmodal">Update Profile</button>
+      <br>
+<div class="alert alert-info alert-dismissible" role="alert">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    To change the profile picture, hover the mouse over the profile picture.
+    </div>
+
+      </div>
+   </div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="tab-pane fade in" id="summary">
+{% if user_info.share_summary|length == 0 %}
+<h1>You have not shared anything...</h1>
+{% else %}
+<div class="jumbotron" style="border: 2px solid #a1a1a1;border-radius: 15px;">
+
+<h2 style="text-align: center;text-decoration: underline;">You have shared {{ user_info.share_summary|length }} times.</h2><br>
+<div style="text-align: left;font-size: 14px;">
+<ol>
+{% for share in  user_info.share_summary %}
+<li>You have shared with <a href="/profile/{{ share.share_to }}">{{ share.share_to }}.</a><br>
+Document : {{ share.document.url|slice:"24:" }}<br>
+On : {{ share.shared_at }}
+</li><br>
+{% endfor %}
+</ol>
+</div>
+</div>
+{% endif %}
+</div>
+<div class="tab-pane fade in" id="following">
+{% if user_info.following|length == 0 %}
+<h1>You are not following anybody...</h1>
+{% else %}
+<div class="jumbotron" style="border: 2px solid #a1a1a1;border-radius: 15px;">
+
+<div style="text-align: center;">
+<h3>You are following {{ user_info.following|length }} people</h3><br>
+{% for followee in  user_info.following %}
+<a href="/profile/{{ followee.username }}">{{ followee.username }}</a><hr>
+{% endfor %}
+</div>
+</div>
+{% endif %}
+</div>
+
+<div class="tab-pane fade in" id="followers">
+{% if user_info.followers|length == 0 %}
+<h1>You have no followers...</h1><br>
+{% else %}
+<div class="jumbotron" style="border: 2px solid #a1a1a1;border-radius: 15px;">
+<div style="text-align: center;">
+<h3>You are being followed by {{user_info.followers|length}} people</h3><br>
+{% for followers in  user_info.followers %}
+<a href="/profile/{{ followers.username }}">{{ followers.username }}</a><hr>
+{% endfor %}
+</div>
+</div>
+{% endif %}
+</div>
+</div>
+</div>
+</div>
+  <!-- changing part ends -->
+
+
+
+<!-- user profile display -->
+<div class="col-lg-3 col-md-3">
+<div class="well" style="background-color: #E9E1E1;">
+ <div class="thumbnail">
+ <div class="profile_pic_thumb">
+ {% if user_info.profile_picture %}
+   <img src="../../../media/{{ user_info.profile_picture }}" id="profile_pic" alt="Profile Picture Not Available" style="margin-bottom:1%;margin-left:2.5%;">
+
+ {% else %}
+     <img src="../../../media/profile_images/default_DP.png" id="profile_pic" alt="Profile Picture Not Available" style="margin-bottom:1%;margin-left:15%;">
+
+{% endif %}
+<label class="label label-default" id='imagechange_label' style="display:none;font-size:12px;" data-toggle="modal" data-target="#ImageChangeModal">Click to change<span class="glyphicon glyphicon-picture"></span></label>
+</div>
+<div class="caption">
+        <label style="font-size: 22px;font-weight: bold;color:threeddarkshadow;">{{user_info.name|default:"No record"}}</label><hr>
+              <label style="font-size: 18px;font-weight: bold;color:#FA6A6F;">{{user_info.gender|capfirst|default:"No record"}}</label><hr>
+                           <label style="font-size: 18px;font-weight: bold;color:#FA6A6F;">Age : {{user_info.dob|default:"No record"}}</label><hr>
+                           <label style="font-size: 18px;font-weight: bold;color:#FA6A6F;">{{user_info.email|default:"No record"}}</label><hr>
+          <label style="font-size: 22px;font-weight: bold;color:threeddarkshadow;">Student at</label><br><label style="font-size: 18px;font-weight: bold;color:#FA6A6F;">{{user_info.institute|default:"No record"}}</label><hr>
+            <label style="font-size: 22px;font-weight: bold;color:threeddarkshadow;">+91- </label> <label style="font-size: 18px;font-weight: bold;color:#FA6A6F;">{{user_info.number|default:"No record"}}</label>
+
+      </div>
+    </div>
+</div>
+</div>
+<!-- user profile display ends -->
+
+<a class="back-to-top" href="#"><img src="{% static 'images/top_button.png' %}" alt="Back to TOP"></a>
+{% else %}
+
+
+
+
+<!-- Carousel Slides -->
+ <div id="myCarousel" class="carousel slide" data-ride="carousel">
+      <!-- Indicators -->
+      <ol class="carousel-indicators">
+        <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+        <li data-target="#myCarousel" data-slide-to="1"></li>
+        <li data-target="#myCarousel" data-slide-to="2"></li>
+      </ol>
+      <div class="carousel-inner" role="listbox">
+        <div class="item active">
+          <img class="first-slide" src="{% static 'images/carousel_2.png' %}" alt="First slide">
+          <div class="container">
+            <div class="carousel-caption">
+              <h1>Welcome to e-Sharing</h1>
+              <p>Sign Up to access.</p>
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <img class="second-slide" src="{% static 'images/carousel_1.png' %}"  alt="Second slide">
+          <div class="container">
+            <div class="carousel-caption">
+              <p><h1 style="color:black;">If already sign up, please Login.</h1></p>
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <img class="third-slide" src="{% static 'images/carousel_3.png' %}"  alt="Third slide">
+          <div class="container">
+            <div class="carousel-caption">
+              <h1 style="color:black;">Welcome to e-Sharing</h1>
+            </div>
+          </div>
+        </div>
+      </div>
+      <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+      </a>
+      <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+      </a>
+    </div>
+ <!-- Carousel Slides ends -->
+ 
+ 
+ 
+ 
+ <!-- Registration Modal -->
+ <div id="registerModal" class="modal fade" data-backdrop="static" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" >
+  <div class="modal-content" style="background-color :#FAFAFA;">
+      <div class="modal-header">
+          <h3 class="text-center" style="font-weight: bold;color: threeddarkshadow;">Register Yourself</h3>
+      </div>
+      <div class="modal-body">
+             <div class="alert alert-warning">
+  <ol>
+  <li><b>Username</b> : Required. 30 characters or fewer. Letters, digits and @ . + - _ only.
+  </li>
+  <li><b>Password</b> : Required. More than 5 characters with first one being a letter. Numbers & underscores are allowed .</li>
+  </ol>
+</div>
+          <form class="form col-lg-12 col-md-12 center-block" method="post" action="/signup/">
+                                {% csrf_token %}    
+                                
+                                <div class="table-responsive" id="register_table">
+                                               
+<table class="table">
+    <tbody>
+    {% for elements in user_form %}
+<tr>    
+      <td id="table_label">{{elements.label}}</td>
+<td> {{elements}}</td>
+          </tr>
+          {% endfor %}
+     </tbody>
+       </table>
+       </div>
+              <button type="submit" id="register_submit" class="btn btn-danger btn-lg btn-block">
+              Register</button><br>
+          </form>
+          {% endif %}
+      </div>
+      <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>	
+      </div>
+  </div>
+  </div>
+	</div>
+	
+	
+<div id="errorModal" class="modal fade" data-keyboard="true" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" >
+  <div class="modal-content" style="background-color :#FAFAFA;">
+      <div class="modal-header">
+            <h1>Error <span class="glyphicon glyphicon-remove"></span></h1>
+   
+      </div>
+      <div class="modal-body" >
+      <h1 style="color: red;">
+      Please provide all details with correct information.
+      </h1>
+      </h6>
+      </div>
+      <div class="modal-footer">	
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>	
+      
+      </div>
+  </div>
+  </div>
+	</div>
+	
+	<div id="successModal" class="modal fade" data-keyboard="True" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" >
+  <div class="modal-content" style="background-color :#FAFAFA;">
+      <div class="modal-header">
+                  <h1>Success <span class="glyphicon glyphicon-ok"></span></h1>
+      
+      </div>
+      <div class="modal-body" >
+      <h1 style="color:blue;">
+Thanks for registration <span class="glyphicon glyphicon-thumbs-up"></span><br>
+Now you can login.
+      </h1>
+      </h6>
+      </div>
+      <div class="modal-footer">	
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>	
+      
+      </div>
+  </div>
+  </div>
+	</div>
+	
+	<!-- Registration Modal ends -->
+		
+	
+ <hr><hr>
+<br>
+<br><br>
+
+
+
+ <!-- Login form portion -->
+ <div id="loginview" >
+ <br>
+ <div class="alert alert-success" role="alert"><h1 style="font-style: italic;font-weight: bolder;">Welcome buddy!!!</h1></div>
+<hr>
+<br>
+  <div class="col-lg-3 col-md-3">
+    <img src="{% static 'images/share_button.png'%}" alt="Share Image" style="width:80%;height:60%;"/>
+  <br><hr><br>
+<p style="position:absolute ;top:110%;left:30%;"><a class="btn btn-info btn-lg" role="button" data-toggle="modal" data-target="#registerModal">Sign Up</a></p>
+  <h4 style="font-family:cursive;font-style: italic;font-weight: bold;">&nbsp;If not registered, then </h4>
+
+  </div>
+
+   <div class="col-lg-9 col-md-9">
+
+   <ul class="nav nav-pills nav-justified">
+  <li id='login_tab_link' class="active"><a href="/#loginview">Login</a></li>
+</ul>
+<div id="myTabContent" class="tab-content">
+
+<div class="tab-pane fade in active">
+    <form class="form col-lg-12 col-md-12 center-block" method="post" action="/login/">
+                  {% csrf_token %}
+                    <hr><hr>
+
+            <div class="form-group input-group">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span>
+                        </span>
+              <input id="login_username" type="text" autofocus="autofocus" class="form-control input-lg" placeholder="Username" name="username" autocomplete="off" style="color: threeddarkshadow;">
+            </div>
+            <hr>
+            <div class="form-group input-group">
+            <span class="input-group-addon">            <span class="glyphicon glyphicon-lock"></span>
+            </span>
+              <input type="password" class="form-control input-lg" placeholder="Password" name="password" style="color: threeddarkshadow;">
+            </div>
+                        <hr><hr>
+
+            <div class="form-group">
+              <button type="submit" id="login_submit" class="btn btn-danger btn-lg btn-block">Sign In</button><br>
+            </div>
+
+
+      </form>
+      <!--
+                                  <div class="other_connect_sources">
+             <div class="col-lg-3 col-md-3">
+<button class="btn btn-primary" id='facebook_button'>Facebook</button>
+<hr>
+              </div>
+              <div class="col-lg-3 col-md-3">
+<button class="btn btn-info" id='twitter_button'>Twitter</button>
+<hr>
+</div>
+              <div class="col-lg-3 col-md-3">
+   <button class="btn btn-success" id='goggle_button'>Google</button>
+   <hr>
+              </div>
+   <div class="col-lg-3 col-md-3">
+   <button class="btn btn-warning" id='linkedin_button'>LinkedIn</button>
+   <hr>
+  </div>
+</div>
+-->
+</div>
+  </div></div>
+   </div>
+
+ <!-- Login and Sign Up ends -->
+
+
+
+ {% endblock %}
+
+ <!-- Profile Picture Change Modal -->
+ <div class="modal fade" id="ImageChangeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog ">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title">Upload the profile picture</h1>
+      </div>
+      <div class="modal-body">
+<form class="form-inline" method="post" action="/update_profile_picture/" enctype="multipart/form-data" >
+                    {% csrf_token %}
+   <div class="form-group">
+      <label class="sr-only" for="uploaded_picture">Choose an image</label>
+      {{ profile_picture_form.picture }}<br><br>
+
+   </div>
+      <div class="form-group">
+
+         <img id="preview" src="../../../media/profile_images/default_DP.png" alt="Profile Picture Not Available">
+   </div>
+   <hr>
+   <button type="submit" class="btn btn-primary" onclick="return validateProfilePicture();">Submit</button>
+</form>      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div>
+ <!-- Profile Picture Change Modal ends -->
+
+
+
+
+ <!-- Share Modal -->
+<div class="modal fade" id="ShareModal" tabindex="-1" role="dialog" aria-labelledby="ShareModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close"
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h1 class="modal-title" id="ShareModalLabel">
+It's sharing time
+            </h1>
+         </div>
+         <div class="modal-body">
+<br>
+<form role="form" data-async action="/shareit/" method="post" id="shareForm" name="shareForm" enctype="multipart/form-data" onsubmit="return validateShareInfo()">
+{% csrf_token %}
+   <div class="form-group" >
+      <label for="share_username" style="font-size: 22px;">Username of user (you want to share with)</label><br>
+{{ share_form.share_to }}
+   </div><br>
+   <div class="form-group">
+      <label for="shared_document" style="font-size: 22px;">Upload the document</label><br>
+{{ share_form.document }}
+                                 <small id="mime_error" class="label label-danger" style="display: none;">The type of the uploaded file is not allowed.</small>
+                           <br>      <small id="size_error" class="label label-danger" style="display: none;">The maximum size of file must not be greater than 5 MB.</small>
+
+   </div>
+   <div class="form-group">
+         <label for="shared_message" style="font-size: 22px;">Message</label><br>
+   	{{ share_form.message }}<br>
+  <span id="characters" style="color:blue;">120</span> characters remaining.
+
+
+   </div><hr style="font-weight: bold;">
+   <button type="submit" name="share_submit" id="share_submit" class="btn btn-primary">Share It</button>
+</form>
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default"
+               data-dismiss="modal">Cancel
+            </button>
+         </div>
+      </div>
+    </div>
+</div>
+<!-- Share Modal ends -->
+
+
+  <!-- Update Details except Profile Picture -->
+<div class="modal fade" id="updatedetailsmodal" tabindex="-1" role="dialog" aria-labelledby="updatedetailsmodal" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h2 class="modal-title"><b>Please update your profile...</b></h2>
+      </div>
+      <div class="modal-body">
+<form class="form-horizontal" id="update_form" method="post" action="/update_profile/">
+                      {% csrf_token %}
+  <div class="form-group">
+    <label for="dob" class="col-lg-2 col-md-2 control-label">Date of Birth</label>
+    <div class="col-lg-10 col-md-10">
+           {{ profile_form.dob }}
+                          <small id="dob_error" class="label label-danger" style="display: none;">Age must be greater than 5.</small>
+                                                          <small id="dob_error1" class="label label-danger" style="display: none;">Enter a valid date.</small>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="number" class="col-lg-2 col-md-2 control-label">Mobile Number</label>
+    <div class="col-lg-10 col-md-10">
+{{ profile_form.number }}
+   <small id="number_error" class="label label-danger"style="display: none;">Enter number in Indian format.</small>
+    </div>
+  </div>
+<div class="form-group">
+    <label for="gender" class="col-lg-2 col-md-2 control-label">Gender</label>
+    <div class="col-lg-10 col-md-10">
+
+                           {{ profile_form.gender }}
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="institute" class="col-lg-2 col-md-2 control-label">School/Institute</label>
+    <div class="col-lg-10 col-md-10">
+                                            {{ profile_form.institute }}
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-lg-offset-2 col-lg-10 col-md-10">
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+
+    </div>
+  </div>
+</form>
+
+   </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- end Update Details -->
+
+
+
+    	<script src="{% static 'js/jquery-2.1.3.min.js' %}"></script>
+    	<script src="{% static 'js/bootstrap3-typeahead.min.js' %}"></script>
+		<script src="{% static 'js/bootstrap.min.js' %}"></script>
+		<script src="{% static 'js/welcome.js' %}"></script>
+		<script>
+
+		//Normal validation for search feature
+	    function validateForm() {
+	        var searched_user = document.forms["searchForm"]["searched_user"].value;
+	        if (searched_user === null || searched_user === "") {
+	            return false;
+	        }
+	        return true;
+	    }
+
+
+		//Validation for Update Details
+			$("#update_form").submit(function(){
+	        			var dob=$("#dob").val();
+	        			var number=$("#number").val();
+	        			var from=new Date( dob.replace(/(\d{2})-(\d{2})-(\d{4})/, "$2/$1/$3") );
+	        			var current=new Date();
+	var c1=true;
+	var c2=true;
+	if(!/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/.test(dob)){
+		$("#dob_error1").css('display','inline');
+	return false;
+	}
+
+	        			if(current>from && current.getFullYear()-from.getFullYear()<=5){
+	        				c1=false;
+	        				$("#dob_error").css('display','inline');
+}
+	        			var number_correct=/^([789]\d{9})$/.test(number);
+	        			if(!number_correct){
+	        				c2=false;
+$("#number_error").css('display','inline');
+	        			}
+	        			if(!(c1 && c2)){
+	        				return false;
+	        			}
+	            });
+
+
+	    //Normal validation for sharing feature
+	    function validateShareInfo(){
+	    	var name = document.forms["shareForm"]["share_username"].value;
+	    	var doc = document.forms["shareForm"]["shared_document"].value;
+	    	if (name === null || name === ""){
+	    		alert('Please enter correct name');
+	    		return false;
+
+	    	}
+	    	if (doc ===  null || doc === ""){
+	    		alert('Upload some document');
+	    		return false;
+	    	}
+
+	    	return true;
+	    }
+
+
+	    //For checking mime and size of uploaded document
+	    function checkForMimeAndSize(input){
+	    	var mime_ok=true;
+	    	var size_ok=true;
+	    	var allowed_types=["application/xml","application/pdf","application/zip","application/x-bzip","application/x-bzip2",
+	                           "image/gif","image/png","image/jpeg","image/bmp","image/svg+xml",
+	                           "text/html","text/plain",
+	                           "application/msword","application/mspowerpoint",
+	                           "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]
+	        if (input.files && input.files[0]) {
+	            var reader = new FileReader();
+
+	            	reader.onload = function(e) {
+	            		  var actual_mime_type=input.files[0].type;
+	            		  if (allowed_types.indexOf(actual_mime_type) === -1){
+	      	            	$("#mime_error").css('display','inline');
+	      	            	mime_ok=false;
+	      	            }else{
+	      	            	$("#mime_error").css('display','none');
+
+	      	            }
+	              		  var actual_size=input.files[0].size;
+	            		  if (actual_size > 5242880){
+		      	            	$("#size_error").css('display','inline');
+	            			  size_ok=false;
+	            		  }else{
+		      	            	$("#size_error").css('display','none');
+
+	            		  }
+	            		if(size_ok===false||mime_ok===false){
+		      	              $('button[type="submit"]').attr('disabled','disabled');
+
+	            		}else{
+		      	              $('button[type="submit"]').removeAttr('disabled');
+
+	            		}
+
+	            		};
+
+	            reader.readAsDataURL(input.files[0]);
+	        }
+	    }
+
+
+
+	    //For message characters count
+	    $('#shared_message').keyup(function() {
+	    	maxLength=120;
+	    	  var length = $(this).val().length;
+	    	  var length = maxLength-length;
+	    	  $('#characters').text(length);
+	    	  if (length<0){
+  	              $('button[type="submit"]').attr('disabled','disabled');
+  	              $('#characters').css('color','red');
+
+	    	  }
+	    	  else{
+	    		  $('button[type="submit"]').removeAttr('disabled');
+  	              $('#characters').css('color','blue');
+	    	  }
+
+	    	});
+	    //For Profile Picture Hover
+	    $(".profile_pic_thumb").hover(function(){
+	        $("#imagechange_label").css("display", "block");
+	        $("#imagechange_label").css("cursor","pointer");
+	    }, function(){
+	    $("#imagechange_label").css("display", "none");
+	})
+
+
+
+//For uploaded profile picture preview
+	function display_thumbnail(input) {
+	        if (input.files && input.files[0]) {
+	            var reader = new FileReader();
+
+	            reader.onload = function (e) {
+	                $('#preview')
+	                    .attr('src', e.target.result)
+	                    .width(200)
+	                    .height(180);
+	            };
+
+	            reader.readAsDataURL(input.files[0]);
+	        }
+	    }
+	   //check to see whether a file has been uploaded
+	   function validateProfilePicture(){
+	   if($("#uploaded_picture").val()===''){
+		   alert("Upload an Image please!!!");
+		   return false;
+
+	   }
+		return true;
+	   }
+	   
+	   //For registration errors
+	   {% if registration_errors %}
+	    $('#errorModal').modal('show');
+	   {% endif %}
+	
+		//For registration success submission
+		{% if registered %}
+   	 	$('#successModal').modal('show');
+		{% endif %}
+		</script>
+
+
+</body>
+</html>
+

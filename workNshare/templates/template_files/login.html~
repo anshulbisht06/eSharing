@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<head>
+<meta charset="UTF-8">
+<link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+<title>Login</title>
+</head>
+<body>
+<div id="loginModal" class="modal show" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" >
+  <div class="modal-content" style="background-color :#FAFAFA;">
+      <div class="modal-header">
+          <h1 class="text-center" style="font-weight: bold;color: threeddarkshadow;">{% if details_invalid %}Please login correctly{% else %}Login{% endif %} </h1>
+      </div>
+      <div class="modal-body" >
+ {% if details_invalid %}<h3 style="color:red;"><span class="glyphicon glyphicon-thumbs-down"></span>&nbsp;&nbsp;&nbsp;Your username/password didn't match.Try again.</h3>{% else %}{% endif %}
+          <form class="form col-lg-12 col-md-12 center-block" method="post" action="/login/">
+                      {% csrf_token %}
+        
+            <div class="form-group input-group">
+                        <span class="input-group-addon">            <span class="glyphicon glyphicon-user"></span>
+                        </span>
+              <input type="text" class="form-control input-lg" placeholder="Username" name="username" autocomplete="off" style="color: threeddarkshadow;">
+            </div>
+            <div class="form-group input-group">
+            <span class="input-group-addon">            <span class="glyphicon glyphicon-lock"></span>
+            </span>
+              <input type="password" class="form-control input-lg" placeholder="Password" name="password" style="color: threeddarkshadow;">
+            </div>
+            <div class="form-group">
+              <button type="submit" class="btn btn-primary btn-lg btn-block">Sign In</button><br>
+            </div>
+          </form>
+      </div>
+      <div class="modal-footer">
+          <div class="col-lg-6 col-md-6">
+                       <button class="btn btn-default " data-target="#myModal" data-toggle="modal" style="color: threeddarkshadow;"><strong>Forgot Username/Password?</strong></button></span>
+         <br>
+         
+          </div>
+                    <div class="col-lg-6 col-md-6">
+          
+    <a href="/signup/"><button class="btn btn-success" aria-hidden="true" >Register Here</button></a>
+		  </div>	
+      </div>
+  </div>
+  </div>
+	</div>
+	
+	
+	
+	
+	<!-- Modal dialog for rescue username/password -->
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h1 class="modal-title label label-warning" id="myModalLabel" style="font-weight: bold;font-size: 30px;">Troubleshoot</h1>
+      </div>
+      <div class="modal-body">
+  <strong style="color: threeddarkshadow;">If you have forgotten your account's password,please <a href='/signup/'>register</a> once again.
+    <br> <br>In case you had forgotten username,click <a href='#'>here</a>.</strong>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-info" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- rescue Modal dialog ends -->
+
+
+<script src="{% static 'js/jquery-2.1.3.min.js' %}"></script>
+		<script src="{% static 'js/bootstrap.min.js' %}"></script>
+</body>
+</html>

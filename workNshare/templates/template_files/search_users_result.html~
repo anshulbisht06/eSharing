@@ -1,0 +1,52 @@
+{% extends 'template_files/welcome.html' %}
+{% load static %}
+    {% block login %}
+       <li  style="position: absolute;right:50px;top:10px;"><button class="btn btn-default" id='logout_button' onclick="window.location='/logout/';">Logout</button></li>
+    
+{% endblock %}
+
+{% block home_page_view %}
+<div class="well well-lg">
+
+<table class="table table-hover">
+   <caption><h2 style="color:black;">Search Results</h2></caption>
+   <thead>
+      <tr>
+         <th>{{ user_info.found_users|length}} result(s) found.</th>
+      </tr>
+   </thead>
+   <tbody>
+   {% for user in user_info.found_users %}
+      <tr>
+         <td>
+         
+         
+       <div class="col-lg-8 col-md-8">
+              <label><a href="/profile/{{ user.username }}">{{ user.first_name }}</a></label><br>
+                            <label style="color:gray;">{{ user.email }}</label><br>
+              
+       </div>
+              <div class="col-lg-4 col-md-4">
+       
+       <button class="btn btn-default" id='visit_profile' onclick="window.location='/profile/{{ user.username }}';">Visit Profile</button>
+        </div>
+         
+         </td>
+      </tr>
+      {% endfor %}
+   </tbody>
+</table>
+<ul class="pager">
+       <strong style="font-size: 30px;">Page {{ user_info.total_list.number }} of {{ user_info.total_list.paginator.num_pages }}.</strong>
+
+        {% if user_info.total_list.has_previous %}
+ <li class="previous"><a href="?searched_user={{user_info.searched_user_name}}&page={{user_info.total_list.previous_page_number }}" data-toggle="tooltip" title="Previous page"><span class="glyphicon glyphicon-circle-arrow-left"></span></a></li>
+        {% endif %}
+        {% if user_info.total_list.has_next %}
+ <li class="next"><a href="?searched_user={{user_info.searched_user_name}}&page={{user_info.total_list.next_page_number }}" data-toggle="tooltip" title="Next page"><span class="glyphicon glyphicon-circle-arrow-right"></span></a></li>
+        {% endif %}
+</ul>
+
+</div>
+
+{% endblock %}

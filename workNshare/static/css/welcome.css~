@@ -1,0 +1,25 @@
+@CHARSET "UTF-8";
+.back-to-top {
+background:none;
+margin:10px;
+position: fixed;
+bottom: 0;
+right: 0;
+width: 50px;
+height: 50px;
+z-index: 100;
+text-decoration: none;
+display:none;
+}
+#loginorsignup{
+	display: none;
+}
+.list-group .list-group-item h4{
+	font-size: 24px;
+	font-weight: lighter;
+}
+
+.table-responsive .table td{
+	color:black;
+}
+
